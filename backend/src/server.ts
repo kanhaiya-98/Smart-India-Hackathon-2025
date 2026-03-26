@@ -28,11 +28,21 @@ app.use('/api/analytics', analyticsRouter);
 
 const PORT = process.env.PORT || 4000;
 
+// Export map for Vercel serverless functions
+export default app;
+
 async function start() {
+  const mongoUri = process.env.MONGODB_URI || '';
+  
+  if (process.env.VERCEL) {
+    if (mongoUri) {
+      await connectToDatabase(mongoUri);
+    }
+    return;
+  }
+
   try {
-    const mongoUri = process.env.MONGODB_URI || '';
     await connectToDatabase(mongoUri);
-    console.log('MongoDB connection established.');
     app.listen(PORT, () => {
       console.log(`Backend server ready on http://localhost:${PORT}`);
     });
@@ -42,6 +52,9 @@ async function start() {
   }
 }
 
-start();
+// Only call start() in local development
+if (!process.env.VERCEL) {
+  start();
+}
 
 
