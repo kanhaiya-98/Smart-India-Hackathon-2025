@@ -69,17 +69,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password })
       });
       if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Login failed:', res.status, errData);
         setIsLoading(false);
         return false;
       }
       const data = await res.json();
-      // data: { token, user }
       localStorage.setItem('civic_token', data.token);
       localStorage.setItem('civic_user', JSON.stringify(data.user));
       setUser(data.user);
       setIsLoading(false);
       return true;
     } catch (e) {
+      console.error('Network or server error during login:', e);
       setIsLoading(false);
       return false;
     }
@@ -94,6 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(payload)
       });
       if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Signup failed:', res.status, errData);
         setIsLoading(false);
         return false;
       }
@@ -104,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       return true;
     } catch (e) {
+      console.error('Network or server error during signup:', e);
       setIsLoading(false);
       return false;
     }
