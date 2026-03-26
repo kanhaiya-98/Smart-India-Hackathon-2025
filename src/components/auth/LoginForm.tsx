@@ -23,12 +23,12 @@ export function LoginForm() {
     setError('');
     
     try {
-      const success = isSignup 
+      const res = isSignup 
         ? await signup({ name, email, password, role })
         : await login(email, password);
         
-      if (!success) {
-        setError(isSignup ? 'Signup failed. Please try a different email or check credentials.' : 'Invalid email or password.');
+      if (!res.success) {
+        setError(res.message || (isSignup ? 'Signup failed.' : 'Invalid email or password.'));
       }
     } catch (err: any) {
       console.error('Submit error:', err);

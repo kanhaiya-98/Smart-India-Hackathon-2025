@@ -12,8 +12,8 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (payload: { name: string; email: string; password: string; role?: User['role']; department?: string; phone?: string; avatar?: string }) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  signup: (payload: { name: string; email: string; password: string; role?: User['role']; department?: string; phone?: string; avatar?: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
     setIsLoading(true);
     try {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -68,22 +68,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        console.error('Login failed:', res.status, errData);
+        console.error('Login failed:', res.status, data);
         setIsLoading(false);
-        return false;
+        return { success: false, message: data.message || data.error || 'Invalid credentials' };
       }
-      const data = await res.json();
       localStorage.setItem('civic_token', data.token);
       localStorage.setItem('civic_user', JSON.stringify(data.user));
       setUser(data.user);
       setIsLoading(false);
-      return true;
-    } catch (e) {
+      return { success: true };
+    } catch (e: any) {
       console.error('Network or server error during login:', e);
       setIsLoading(false);
-      return false;
+      return { success: false, message: 'Network error or server down' };
     }
   };
 
@@ -95,22 +94,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        console.error('Signup failed:', res.status, errData);
+        console.error('Signup failed:', res.status, data);
         setIsLoading(false);
-        return false;
+        return { success: false, message: data.message || data.error || 'Signup failed' };
       }
-      const data = await res.json();
       localStorage.setItem('civic_token', data.token);
       localStorage.setItem('civic_user', JSON.stringify(data.user));
       setUser(data.user);
       setIsLoading(false);
-      return true;
-    } catch (e) {
+      return { success: true };
+    } catch (e: any) {
       console.error('Network or server error during signup:', e);
       setIsLoading(false);
-      return false;
+      return { success: false, message: 'Network error or server down' };
     }
   };
 
