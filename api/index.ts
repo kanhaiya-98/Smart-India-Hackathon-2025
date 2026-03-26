@@ -1,5 +1,5 @@
-import app from '../backend/src/server';
-import { connectToDatabase } from '../backend/src/db';
+import app from './server.js';
+import { connectToDatabase } from './db.js';
 
 export default async (req: any, res: any) => {
   try {

@@ -2,11 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 
-import authRouter from './routes/auth';
-import issuesRouter from './routes/issues';
-import usersRouter from './routes/users';
-import analyticsRouter from './routes/analytics';
-import { connectToDatabase } from './db';
+import authRouter from './routes/auth.js';
+import issuesRouter from './routes/issues.js';
+import usersRouter from './routes/users.js';
+import analyticsRouter from './routes/analytics.js';
+import { connectToDatabase } from './db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

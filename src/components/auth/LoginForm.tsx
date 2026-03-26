@@ -21,11 +21,18 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = isSignup 
-      ? await signup({ name, email, password, role })
-      : await login(email, password);
-    if (!success) {
-      setError(isSignup ? 'Signup failed (email may exist).' : 'Invalid credentials.');
+    
+    try {
+      const success = isSignup 
+        ? await signup({ name, email, password, role })
+        : await login(email, password);
+        
+      if (!success) {
+        setError(isSignup ? 'Signup failed. Please try a different email or check credentials.' : 'Invalid email or password.');
+      }
+    } catch (err: any) {
+      console.error('Submit error:', err);
+      setError('An unexpected error occurred. Please try again later.');
     }
   };
 
